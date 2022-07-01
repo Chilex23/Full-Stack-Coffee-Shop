@@ -20,6 +20,8 @@ CORS(app)
 #db_drop_and_create_all()
 
 # ROUTES
+
+
 @app.route("/drinks")
 def get_drinks():
     drinks = Drink.query.all()
@@ -27,6 +29,7 @@ def get_drinks():
         "success": True,
         "drinks": [drink.short() for drink in drinks]
     })
+
 
 @app.route("/drinks-detail")
 @requires_auth("get:drinks-detail")
@@ -36,6 +39,7 @@ def get_drinks_details(payload):
         "success": True,
         "drinks": [drink.long() for drink in drinks]
     })
+
 
 @app.route("/drinks", methods=["POST"])
 @requires_auth("post:drinks")
@@ -91,7 +95,7 @@ def update_drink(payload, id):
 
     try:
         drink.update()
-    except:
+    except Exception:
         db.session.rollback()
         abort(500)
 
@@ -99,6 +103,7 @@ def update_drink(payload, id):
         "success": True,
         "drinks": [drink.long()]
     })
+
 
 @app.route("/drinks/<id>", methods=["DELETE"])
 @requires_auth("delete:drinks")
@@ -110,7 +115,7 @@ def delete_drinK(payload, id):
 
     try:
         drink.delete()
-    except:
+    except Exception:
         db.session.rollback()
         abort(500)
 
@@ -119,10 +124,12 @@ def delete_drinK(payload, id):
         "delete": id
     })
 
+
 # Error Handling
 '''
 Example error handling for unprocessable entity
 '''
+
 @app.errorhandler(401)
 def unauthorized(error):
     return jsonify({
@@ -140,6 +147,7 @@ def unprocessable(error):
         "message": "unprocessable"
     }), 422
 
+
 @app.errorhandler(400)
 def bad_request(error):
     return jsonify({
@@ -148,13 +156,15 @@ def bad_request(error):
         "message": "Bad request."
     }), 400
 
+
 @app.errorhandler(403)
-def unauthorized(error):
+def forbidden(error):
     return jsonify({
         "success": False,
         "error": 403,
         "message": "You are forbidden from making this request."
     }), 403
+
 
 @app.errorhandler(409)
 def conflict(error):
@@ -182,10 +192,13 @@ def server_error(error):
         "message": "Internal Server Error."
     }), 500
 
+
 '''
 @TODO implement error handler for 404
     error handler should conform to general task above
 '''
+
+
 @app.errorhandler(404)
 def not_found(error):
     return jsonify({
@@ -194,10 +207,13 @@ def not_found(error):
         "message": "Resource not found."
     })
 
+
 '''
 @TODO implement error handler for AuthError
     error handler should conform to general task above
 '''
+
+
 @app.errorhandler(AuthError)
 def auth_error(error):
     return jsonify({
